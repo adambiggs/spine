@@ -106,8 +106,7 @@ describe("Model.Relation", function(){
     Album.hasOne("photo", Photo);
     Photo.belongsTo("album", Album);
 
-    var album = new Album();
-    album.load({
+    var album = new Album({
       name: "Beautiful album",
       photo: {
         name: "Beautiful photo"
@@ -117,7 +116,7 @@ describe("Model.Relation", function(){
     expect( album ).toBeTruthy();
     expect( album.id ).toEqual(Album.uuid());
     expect( album.photo() ).toBeTruthy();
-    expect( album.photo().id ).toEqual(Photo.uuid());
+    expect( album.photo().album_id ).toEqual(Album.uuid());
     expect( album.photo().name ).toBe("Beautiful photo");
 
     delete Album.uuid
@@ -253,8 +252,7 @@ describe("Model.Relation", function(){
     Album.hasMany("photos", Photo);
     Photo.belongsTo("album", Album);
 
-    var album = new Album();
-    album.load({
+    var album = new Album({
       name: "Beautiful album",
       photos: [{
         name: "Beautiful photo 1"
@@ -268,7 +266,7 @@ describe("Model.Relation", function(){
     expect( album ).toBeTruthy();
     expect( album.id ).toEqual(Album.uuid());
     expect( album.photos().first() ).toBeTruthy();
-    expect( album.photos().first().id ).toEqual(Photo.uuid());
+    expect( album.photos().first().album_id ).toEqual(Album.uuid());
     expect( album.photos().first().name ).toBe("Beautiful photo 1");
 
     delete Album.uuid
