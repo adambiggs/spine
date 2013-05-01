@@ -11,8 +11,11 @@ class Collection extends Spine.Module
     @model.select (rec) => @associated(rec)
 
   fetch: (params, options = {})->
-    options.url ?= Spine.Ajax.getCollectionURL(@record)
-    @model.fetch?(params, options)
+    unless options.url
+      scope = new @model()
+      scope[@fkey] = @record.id
+      options.url = Spine.Ajax.getCollectionURL(scope)
+    @model.ajax?().fetch(params, options)
 
   first: ->
     @all()[0]
