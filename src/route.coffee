@@ -23,7 +23,7 @@ class Spine.Route extends Spine.Module
     if (typeof path is 'object' and path not instanceof RegExp)
       @add(key, value) for key, value of path
     else
-      @routes.push(new @(path, callback))
+      @routes.unshift(new @(path, callback))
 
   @setup: (options = {}) ->
     @options = $.extend({}, @options, options)
@@ -64,7 +64,7 @@ class Spine.Route extends Spine.Module
 
     @trigger('navigate', @path)
 
-    @matchRoute(@path, options) if options.trigger
+    @matchRoutes(@path, options) if options.trigger
 
     return if options.shim
 
@@ -93,12 +93,13 @@ class Spine.Route extends Spine.Module
     path = @getPath()
     return if path is @path
     @path = path
-    @matchRoute(@path)
+    @matchRoutes(@path)
 
-  @matchRoute: (path, options) ->
-    for route in @routes when route.match(path, options)
-      @trigger('change', route, path)
-      return route
+  @matchRoutes: (path, options = {}) ->
+    matches = []
+    matches.push route for route in @routes when route.match(path, $.extend({}, options))
+    @trigger('change', matches, path)
+    matches
 
   constructor: (@path, @callback) ->
     @names = []
