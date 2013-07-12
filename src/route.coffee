@@ -2,9 +2,9 @@ Spine = @Spine or require('spine')
 $     = Spine.$
 
 hashStrip    = /^#*/
-namedParam   = /:([\w\d]+)/g
+namedParam   = /:([\w\d]+)(?:!([\w\d-]+))*/g
 splatParam   = /\*([\w\d]+)/g
-escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
+escapeRegExp = /[[\]{}()+?.,\\^$|#\s]/g
 
 class Spine.Route extends Spine.Module
   @extend Spine.Events
@@ -105,7 +105,8 @@ class Spine.Route extends Spine.Module
 
   @matchRoutes: (path, options = {}) ->
     matches = []
-    matches.push route for route in @routes when route.match(path, $.extend({}, options))
+    for route in @routes when route.match(path, $.extend({}, options))
+      matches.push route
     @trigger('change', matches, path)
     matches
 
@@ -124,9 +125,13 @@ class Spine.Route extends Spine.Module
       while (match = splatParam.exec(path)) != null
         @names.push(match[1])
 
+      # Use different regexp if excludes have been defined
+      replaceParams = (match, substrs..., offset, string)->
+        if substrs[1] then "(?!#{ substrs[1] }\\b)([^\/]*)" else '([^\/]*)'
+
       path = path.replace(escapeRegExp, '\\$&')
-                 .replace(namedParam, '([^\/]*)')
-                 .replace(splatParam, '(.*?)')
+      path = path.replace(namedParam, replaceParams)
+      path = path.replace(splatParam, '(.*?)')
 
       @route = new RegExp("^#{path}$")
     else
