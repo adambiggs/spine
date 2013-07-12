@@ -18,6 +18,7 @@ class Spine.Route extends Spine.Module
     history: false
     shim: false
     replace: false
+    redirect: false
 
   @add: (path, callback) ->
     if (typeof path is 'object' and path not instanceof RegExp)
@@ -64,9 +65,11 @@ class Spine.Route extends Spine.Module
 
     @trigger('navigate', @path)
 
-    @matchRoutes(@path, options) if options.trigger
+    routes = @matchRoutes(@path, options) if options.trigger
 
     return if options.shim
+
+    @redirect(@path) if options.redirect and not routes.length
 
     if @history and options.replace
       history.replaceState({}, document.title, @path)
@@ -101,6 +104,9 @@ class Spine.Route extends Spine.Module
       matches.push route
     @trigger('change', matches, path)
     matches
+
+  @redirect: (path) ->
+    window.location = path
 
   constructor: (@path, @callback) ->
     @names = []
