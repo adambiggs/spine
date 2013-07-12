@@ -183,6 +183,29 @@ describe("Routing", function () {
         });
       });
 
+      it("can call routes with params that exclude specific values", function () {
+        Route.add({"/users/:id!not-this/:id2!0r_this": spy});
+
+        navigate('/users/not-this/2').done(function () {
+          expect(spy).not.toHaveBeenCalled();
+
+          navigate('/users/1/0r_this').done(function () {
+            expect(spy).not.toHaveBeenCalled();
+
+            navigate('/users/1/2').done(function () {
+              expect(JSON.stringify(spy.mostRecentCall.args)).toBe(JSON.stringify([{
+                trigger: true,
+                history: false,
+                shim: true,
+                replace: false,
+                match: ["/users/1/2", "1", "2"], id: "1", id2: "2"
+              }]));
+            });
+          });
+        });
+
+      });
+
       it("can call routes with glob", function () {
         Route.add({"/page/*stuff": spy});
 
