@@ -200,6 +200,7 @@ describe("Routing", function () {
                 history: false,
                 shim: true,
                 replace: false,
+                redirect: false,
                 match: ["/users/1/2", "1", "2"], id: "1", id2: "2"
               }]));
             });
