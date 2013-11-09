@@ -11,11 +11,13 @@ class Collection extends Spine.Module
     @model.select (rec) => @associated(rec)
 
   fetch: (params, options = {})->
-    unless options.url
-      scope = new @model()
-      scope[@fkey] = @record.id
-      options.url = Spine.Ajax.getCollectionURL(scope)
+    options.url ?= @url()
     @model.ajax?().fetch(params, options)
+
+  url: ->
+    scope        = new @model()
+    scope[@fkey] = @record.id
+    Spine.Ajax.getCollectionURL(scope)
 
   first: ->
     @all()[0]
@@ -139,5 +141,5 @@ Spine.Model.extend
       association(name, model, @, fkey, Singleton).update(value).find()
 
 Spine.Collection = Collection
-Spine.Singleton = Singleton
-Spine.Instance = Instance
+Spine.Singleton  = Singleton
+Spine.Instance   = Instance
